@@ -1,0 +1,17 @@
+# 依存パッケージ・ビルド成果物
+node_modules/
+dist/
+
+# 環境変数（Google Cloud のプロジェクト ID などを含むため公開しない）
+.env
+.env.*
+
+# Windows からコピーしたときに作られる付帯ファイル
+*:Zone.Identifier
+
+# 展開済みフォルダと同じ内容の zip
+*.zip
+
+# ログ・OS 固有ファイル
+*.log
+.DS_Store
