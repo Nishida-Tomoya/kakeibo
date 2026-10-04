@@ -2,10 +2,13 @@
 node_modules/
 dist/
 
-# 環境変数（Google Cloud のプロジェクト ID などを含むため公開しない）
+# 環境変数（API キーやトークンなどを含むため公開しない）
 .env
 .env.*
 !.env.example
+
+# 家計簿のデータ（データベースとレシート画像）
+app/data/
 
 # Windows からコピーしたときに作られる付帯ファイル
 *:Zone.Identifier
