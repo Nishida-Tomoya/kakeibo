@@ -5,6 +5,7 @@ dist/
 # 環境変数（Google Cloud のプロジェクト ID などを含むため公開しない）
 .env
 .env.*
+!.env.example
 
 # Windows からコピーしたときに作られる付帯ファイル
 *:Zone.Identifier
