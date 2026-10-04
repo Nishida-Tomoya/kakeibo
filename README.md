@@ -7,6 +7,7 @@
 | フォルダ | 内容 |
 |---|---|
 | [app/](app/) | 現在開発中の家計簿アプリ本体。使い方・起動方法は [app/README.md](app/README.md) を参照 |
+| [docs/](docs/) | 作業記録などの文書。日付ごとに、何を・なぜ・どこまでやったかをまとめている |
 | [base_system/](base_system/) | 参考にした試作版（Google の Vertex AI Studio で作成）。データはブラウザ内保存、AI は Gemini。現在は参照用で、開発はしていない |
 
 ## 使用技術（app）
