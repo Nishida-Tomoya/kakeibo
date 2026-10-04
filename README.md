@@ -14,5 +14,5 @@
 - 画面：React + TypeScript（ビルドツールは Vite、デザインは Tailwind CSS、グラフは Recharts）
 - サーバー：Node.js + Express + TypeScript
 - データ保存：SQLite（1ファイルで動くデータベース）
-- AI（レシート読み取り）：Claude API
+- AI（レシート読み取り）：Gemini API（無料枠）。設定で Claude API に切り替え可能
 - 通知：LINE Messaging API

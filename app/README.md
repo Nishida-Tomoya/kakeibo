@@ -7,7 +7,7 @@
 
 | 画面 | 機能 |
 |---|---|
-| 入力 | 支出・収入の手入力。支出はレシートを撮影すると、AI（Claude）が店名・日付・合計・品目を読み取り、カテゴリごとの内訳にして登録できる |
+| 入力 | 支出・収入の手入力。支出はレシートを撮影すると、AI（Gemini または Claude）が店名・日付・合計・品目を読み取り、カテゴリごとの内訳にして登録できる |
 | 明細 | 月ごとの明細一覧。タップすると修正・削除できる |
 | レシート | 保存したレシートの一覧（店名検索・月で絞り込み）。品目と画像を確認でき、削除するとそのレシートから登録した明細も消える |
 | 集計 | 月ごとの収入・支出・収支、カテゴリ別の円グラフ、過去6か月の推移 |
@@ -21,7 +21,7 @@
 | 項目 | base_system | このアプリ |
 |---|---|---|
 | データの保存先 | ブラウザの中（localStorage）。ブラウザのデータを消すと消え、端末間で共有できない | サーバー上のデータベース（SQLite）。どの端末からでも同じデータを見られる |
-| AI | Gemini（Google Cloud の設定が必要） | Claude（API キーだけで使える） |
+| AI | Gemini を Vertex AI 経由で使用（Google Cloud の設定と支払い登録が必要） | Gemini API の無料枠（既定）か Claude API を、設定ファイルで切り替えて使う。どちらも API キーだけで使える |
 | 明細の修正・削除 | なし | あり |
 | ログイン | なし | あり（家族ごとのアカウント） |
 | メール取込 | あり | なし（今回は対象外） |
@@ -37,7 +37,7 @@ app/
 │   │   ├── db.ts            データベースの作成（テーブル定義はここ）
 │   │   ├── auth.ts          ログイン・パスワード
 │   │   ├── routes/          API（auth / transactions / receipts / reports）
-│   │   └── services/        Claude でのレシート読み取り、集計、LINE 送信
+│   │   └── services/        レシート読み取り（receipt.ts で Gemini / Claude を切り替え）、集計、LINE 送信
 │   └── .env.example         設定ファイルの見本
 ├── web/           画面（React + TypeScript + Vite + Tailwind CSS）
 │   └── src/
@@ -77,7 +77,10 @@ cp server/.env.example server/.env
 
 | 項目 | 内容 | 必須か |
 |---|---|---|
-| `ANTHROPIC_API_KEY` | Claude API のキー。[Claude Console](https://platform.claude.com) で発行する | レシート読み取りを使うなら必須 |
+| `AI_PROVIDER` | レシート読み取りに使う AI。`gemini`（既定）か `claude` | 任意 |
+| `GEMINI_API_KEY` | Gemini API のキー（作り方は下記） | Gemini でレシート読み取りを使うなら必須 |
+| `GEMINI_MODEL` | 最初に使う Gemini のモデル（既定 `gemini-3.8-flash`）。混雑中・回数上限のときは自動で `gemini-3.5-flash-lite` でやり直す | 任意 |
+| `ANTHROPIC_API_KEY` | Claude API のキー（有料）。[Claude Console](https://platform.claude.com) で発行する | `AI_PROVIDER=claude` のときに必須 |
 | `LINE_CHANNEL_ACCESS_TOKEN` | LINE 公式アカウントのチャネルアクセストークン（作り方は下記） | LINE レポートを使うなら必須。空なら送信しない |
 | `PORT` | サーバーのポート番号（既定 3001） | 任意 |
 | `DATA_DIR` | データの置き場所（既定 `app/data`） | 任意 |
@@ -85,7 +88,17 @@ cp server/.env.example server/.env
 
 `.env` は GitHub に上がらないよう除外してあります。
 
-### 4. LINE 公式アカウントの準備（LINE レポートを使う場合）
+### 4. Gemini API キーの準備（レシート読み取りを使う場合）
+
+1. [Google AI Studio](https://aistudio.google.com/) に Google アカウントでログインする
+2. 「Get API key」から API キーを発行する。**支払い方法は登録しない**（登録しなければ無料枠のまま使える）
+3. 発行したキーを `server/.env` の `GEMINI_API_KEY` に書く
+
+無料枠についての注意：
+- 使える回数に上限があります（1分あたり・1日あたり）。上限は Google が随時変えており、AI Studio の画面で確認できます。上限に達すると「時間をおいてお試しください」と表示されます。
+- 無料枠では、送ったレシート画像の内容が Google の製品改善に使われます。気になる場合は、有料の Claude（`AI_PROVIDER=claude`）か Gemini の有料枠に切り替えてください。
+
+### 5. LINE 公式アカウントの準備（LINE レポートを使う場合）
 
 以前の「LINE Notify」は2025年3月に終了したため、LINE 公式アカウントの Messaging API を使います。個人利用なら無料プランで足ります（無料プランは月200通まで。家族4人に月1回送ると4通）。
 

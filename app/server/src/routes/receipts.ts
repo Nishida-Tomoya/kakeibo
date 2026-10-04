@@ -5,7 +5,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { EXPENSE_CATEGORIES } from '../../../shared/categories.ts';
 import { db, RECEIPT_IMAGE_DIR } from '../db.ts';
-import { analyzeReceipt, ReceiptReadError } from '../services/claude.ts';
+import { analyzeReceipt, ReceiptReadError } from '../services/receipt.ts';
 
 export const receiptsRouter = Router();
 
